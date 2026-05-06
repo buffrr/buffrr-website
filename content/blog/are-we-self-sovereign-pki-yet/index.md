@@ -2,7 +2,6 @@
 title = "Are we self-sovereign PKI yet?"
 date = 2026-05-06
 description = "Every end-to-end encrypted messenger ships a fingerprint UI. Almost nobody opens it. A note on what's actually missing."
-path = "/blog/are-we-self-sovereign-pki-yet.html"
 
 [taxonomies]
 tags = ["pki", "cryptography"]
@@ -10,13 +9,13 @@ tags = ["pki", "cryptography"]
 
 Signal is end-to-end encrypted in the sense that the keys are end-to-end. Whether you got the right keys is a different question, and almost nobody asks it.
 
-<img src="/blog/are-we-self-sovereign-pki-yet.html/signal-safety-number.png" alt="Signal safety number screen" width="320" />
+<img src="signal-safety-number.png" alt="Signal safety number screen" width="320" />
 
 Safety numbers on Signal exist because, in principle, the server could hand you the wrong key for your contact. You're supposed to walk through one the first time you talk to someone you care about. In practice, almost nobody does.
 
 iMessage shipped the same idea in late 2023, called Contact Key Verification:
 
-<img src="/blog/are-we-self-sovereign-pki-yet.html/imessage-contact-key-verification.png" alt="iMessage Contact Key Verification: Show Public Verification Code" width="320" />
+<img src="imessage-contact-key-verification.png" alt="iMessage Contact Key Verification: Show Public Verification Code" width="320" />
 
 WhatsApp has a Security Code. Threema rates contacts red, orange, or green depending on how they were added. Matrix has cross-signed device verification with comparison emoji. PGP has fingerprints, which is where this whole pattern started, and about which there is little left to say beyond [Filippo Valsorda's 2016 essay](https://words.filippo.io/giving-up-on-long-term-pgp/).
 
@@ -55,6 +54,7 @@ Not a better platform. Not a more auditable CA. No privileged operator at all.
 This works today:
 
 ```
+$ cargo install --git https://github.com/spacesprotocol/beam
 $ beam grace@key AGE
 age1k2spr6duuu07857wqg0922hd7j0rlnjjax4jvvk50yyhcstn6swspyzh4t
 ```
