@@ -1,0 +1,18 @@
+base_url = "https://example.com"
+title = "Buffrr"
+description = "Notes on cryptography, naming, and self-sovereign systems."
+default_language = "en"
+compile_sass = false
+build_search_index = false
+generate_feeds = true
+feed_filenames = ["atom.xml"]
+
+taxonomies = [
+  { name = "tags", feed = true },
+]
+
+[markdown]
+smart_punctuation = true
+
+[extra]
+author = "Buffrr"

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <section class="intro">
+    <h1>{{ config.title }}</h1>
+    {% if config.description %}<p>{{ config.description }}</p>{% endif %}
+  </section>
+
+  {% set blog = get_section(path="blog/_index.md") %}
+  <section class="post-list">
+    <h2>Recent posts</h2>
+    <ul>
+      {% for page in blog.pages %}
+        <li>
+          <a href="{{ page.permalink | safe }}">{{ page.title }}</a>
+          <time datetime="{{ page.date }}">{{ page.date | date(format="%Y-%m-%d") }}</time>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endblock %}

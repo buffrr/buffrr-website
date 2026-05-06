@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="{{ config.default_language }}">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}{{ config.title }}{% endblock %}</title>
+  {% if config.description %}<meta name="description" content="{{ config.description }}" />{% endif %}
+  {% if config.generate_feeds %}
+    {% for feed in config.feed_filenames %}
+      <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url(path=feed, trailing_slash=false) | safe }}" />
+    {% endfor %}
+  {% endif %}
+  <link rel="stylesheet" href="{{ get_url(path='style.css', trailing_slash=false) | safe }}" />
+</head>
+<body>
+  <header class="site-header">
+    <a href="{{ config.base_url }}" class="site-title">{{ config.title }}</a>
+    <nav>
+      <a href="{{ get_url(path='@/blog/_index.md') | safe }}">Blog</a>
+    </nav>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="site-footer">
+    <p>&copy; {{ now() | date(format="%Y") }} {{ config.extra.author }}</p>
+  </footer>
+</body>
+</html>
