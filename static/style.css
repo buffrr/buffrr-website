@@ -92,6 +92,40 @@ pre {
   font-size: 0.9rem;
 }
 
+.not-found {
+  padding: 4rem 0 2rem;
+  text-align: left;
+}
+
+.not-found .code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin: 0 0 1rem;
+}
+
+.not-found h1 {
+  font-size: 2rem;
+  margin: 0 0 1rem;
+  letter-spacing: -0.01em;
+}
+
+.not-found p {
+  color: var(--muted);
+  max-width: 32rem;
+}
+
+.not-found .links {
+  margin-top: 2rem;
+  font-size: 0.95rem;
+}
+
+.not-found .links span {
+  margin: 0 0.5rem;
+  color: var(--rule);
+}
+
 .site-footer {
   max-width: 42rem;
   margin: 0 auto;

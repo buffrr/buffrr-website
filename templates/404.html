@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Not found &middot; {{ config.title }}{% endblock %}
+
+{% block content %}
+  <section class="not-found">
+    <p class="code">404</p>
+    <h1>This name doesn't resolve.</h1>
+    <p>The page you're looking for isn't here — maybe it moved, or maybe it never existed.</p>
+    <p class="links"><a href="{{ config.base_url | safe }}">Home</a> <span aria-hidden="true">·</span> <a href="{{ get_url(path='@/blog/_index.md') | safe }}">Blog</a></p>
+  </section>
+{% endblock %}
