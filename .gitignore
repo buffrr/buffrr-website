@@ -1,4 +1,9 @@
 public/
 static/processed_images/
+static/og/
+static/favicon.svg
+static/favicon.png
+static/apple-touch-icon.png
+node_modules/
 .DS_Store
 .idea

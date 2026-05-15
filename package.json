@@ -1,0 +1,15 @@
+{
+  "name": "buffrr-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "og": "node scripts/og.mjs",
+    "favicon": "node scripts/favicon.mjs",
+    "build": "node scripts/og.mjs && node scripts/favicon.mjs && zola build"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.5",
+    "@resvg/resvg-js": "^2.6.2",
+    "satori": "^0.13.2"
+  }
+}

@@ -5,11 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}{{ config.title }}{% endblock %}</title>
   {% if config.description %}<meta name="description" content="{{ config.description }}" />{% endif %}
+  <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
+  <meta property="og:title" content="{% block og_title %}{{ config.title }}{% endblock %}" />
+  <meta property="og:description" content="{% block og_description %}{{ config.description }}{% endblock %}" />
+  <meta property="og:url" content="{% block og_url %}{{ config.base_url | safe }}{% endblock %}" />
+  <meta property="og:image" content="{% block og_image %}{{ get_url(path='og/default.png', trailing_slash=false) | safe }}{% endblock %}" />
+  <meta name="twitter:card" content="summary_large_image" />
   {% if config.generate_feeds %}
     {% for feed in config.feed_filenames %}
       <link rel="alternate" type="application/atom+xml" title="{{ config.title }}" href="{{ get_url(path=feed, trailing_slash=false) | safe }}" />
     {% endfor %}
   {% endif %}
+  <link rel="icon" href="{{ get_url(path='favicon.svg', trailing_slash=false) | safe }}" type="image/svg+xml" />
+  <link rel="icon" href="{{ get_url(path='favicon.png', trailing_slash=false) | safe }}" type="image/png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="{{ get_url(path='apple-touch-icon.png', trailing_slash=false) | safe }}" />
   <link rel="stylesheet" href="{{ get_url(path='style.css', trailing_slash=false) | safe }}" />
 </head>
 <body>

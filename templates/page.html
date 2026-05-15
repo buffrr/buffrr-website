@@ -2,6 +2,12 @@
 
 {% block title %}{{ page.title }} &middot; {{ config.title }}{% endblock %}
 
+{% block og_type %}article{% endblock %}
+{% block og_title %}{{ page.title }}{% endblock %}
+{% block og_description %}{{ page.description | default(value=config.description) }}{% endblock %}
+{% block og_url %}{{ page.permalink | safe }}{% endblock %}
+{% block og_image %}{% if page.extra.og_image %}{{ get_url(path=page.extra.og_image, trailing_slash=false) | safe }}{% else %}{{ get_url(path='og/' ~ page.slug ~ '.png', trailing_slash=false) | safe }}{% endif %}{% endblock %}
+
 {% block content %}
   <article>
     <header>
