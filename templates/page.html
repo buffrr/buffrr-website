@@ -8,11 +8,14 @@
 {% block og_url %}{{ page.permalink | safe }}{% endblock %}
 {% block og_image %}{% if page.extra.og_image %}{{ get_url(path=page.extra.og_image, trailing_slash=false) | safe }}{% else %}{{ get_url(path='og/' ~ page.slug ~ '.png', trailing_slash=false) | safe }}{% endif %}{% endblock %}
 
+{% block robots %}{% if page.extra.unlisted %}<meta name="robots" content="noindex, nofollow" />{% endif %}{% endblock %}
+{% block body_class %}{% if page.extra.unlisted %}unlisted{% endif %}{% endblock %}
+
 {% block content %}
   <article>
     <header>
       <h1>{{ page.title }}</h1>
-      <time datetime="{{ page.date }}">{{ page.date | date(format="%B %-d, %Y") }}</time>
+      <time datetime="{{ page.date }}">{{ page.date | date(format="%B %-d, %Y") }}</time>{% if page.extra.unlisted %}<span class="draft-badge">Draft &middot; unlisted</span>{% endif %}
     </header>
     <div class="post-body">
       {{ page.content | safe }}

@@ -134,3 +134,22 @@ pre {
   color: var(--muted);
   font-size: 0.9rem;
 }
+
+/* Draft pages sit on pure white so the figures blend into the page. */
+body.unlisted {
+  --bg: #fff;
+}
+
+.draft-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.5rem;
+  vertical-align: 1px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  font-family: ui-sans-serif, -apple-system, system-ui, sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}

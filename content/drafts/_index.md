@@ -1,0 +1,8 @@
++++
+title = "Drafts"
+sort_by = "date"
+page_template = "page.html"
+render = false
+generate_feeds = false
+in_search_index = false
++++
