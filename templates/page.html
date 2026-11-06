@@ -2,6 +2,9 @@
 
 {% block title %}{{ page.title }} &middot; {{ config.title }}{% endblock %}
 
+{% block description %}{{ page.description | default(value=config.description) }}{% endblock %}
+{% block author %}{% if page.authors %}{{ page.authors | join(sep=", ") }}{% else %}{{ config.author }}{% endif %}{% endblock %}
+
 {% block og_type %}article{% endblock %}
 {% block og_title %}{{ page.title }}{% endblock %}
 {% block og_description %}{{ page.description | default(value=config.description) }}{% endblock %}

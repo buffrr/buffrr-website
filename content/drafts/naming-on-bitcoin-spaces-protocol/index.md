@@ -1,15 +1,16 @@
 +++
-title = "Bitcoin Layer 2 for Naming: Spaces Protocol"
-date = 2026-09-10
-description = "Spaces is an off-chain name issuance protocol enabling a self-sovereign alternative to DNS that is anchored to Bitcoin."
+title = "Naming on Bitcoin: Spaces Protocol"
+date = 2026-11-03
+description = "Spaces is an off-chain name issuance protocol anchored to Bitcoin, a self-sovereign alternative to DNS with no dependency on centralized authorities."
+authors = ["buffrr"]
 
 [extra]
 unlisted = true
 +++
 
-Spaces is an off-chain name issuance protocol anchored to Bitcoin, designed as a self-sovereign alternative to DNS.
+Self-sovereign keys are a solved problem. Self-sovereign names are not. The moment you want a Nostr pubkey or a Bitcoin address to be reachable by something a person can remember, DNS comes back in. A Nostr NIP-05 name points at a domain. BIP-353 payment instructions live in DNS records whose authenticity rests on the DNSSEC key hierarchy. The key is yours, but the name that makes the key usable belongs to a registrar, and the proof that the two go together depends on who holds signing keys at the root.
 
-> **TODO:** why this is better than DNS/BIP-353, NIP-05, … etc? why do we need self-soverign naming for bitcoin at all??
+Spaces is an off-chain name issuance protocol anchored to Bitcoin, a self-sovereign alternative with no dependency on centralized authorities.
 
 Handles look like email addresses: `yourname@example`. The top level part, `@example`, is acquired through an on-chain auction mechanism built from Bitcoin scripts, and the proceeds of those auctions are burned. There is no token, no foundation, and no centralized holder of top level spaces.
 
@@ -21,8 +22,7 @@ The sections below walk through the individual components of the Spaces stack.
 
 ## The Handles Tree
 
-Winning a top level space makes the bidder its operator. The auction mechanism itself is covered further down. An operator's job is issuing handles, and that happens entirely off-chain.
-
+Whoever wins a top-level space becomes its operator. The auction mechanism itself is covered further down. An operator's job is issuing handles, and that happens entirely off-chain.
 
 
 ![Every handle in a space is a leaf in a Binary Merkle Trie whose root the operator commits to Bitcoin](handles-tree-light.png)
@@ -31,7 +31,7 @@ Winning a top level space makes the bidder its operator. The auction mechanism i
 
 A handle is a binding between a human-readable name and a script pubkey, which is a standard Bitcoin locking script. The operator maintains a Binary Merkle Trie containing every one of these bindings for their space, and periodically commits the root of that tree to Bitcoin as a single 32-byte hash.
 
-That 32 bytes covers the whole tree regardless of size. Ten handles or ten million handles produce the same on-chain footprint. Because names are never individually written to the chain, issuing one costs the operator nothing beyond the periodic commitment they were making anyway.
+Those 32 bytes cover the whole tree regardless of size. Ten handles or ten million handles produce the same on-chain footprint. Because names are never individually written to the chain, issuing one costs the operator nothing beyond the periodic commitment they were making anyway.
 
 Commitments are strictly append-only. Each new commitment extends the previous state with additions, and existing bindings are never modified or removed. Certificates prove that any additions in a commitment did not exist in any prior commitment. That constraint is what prevents double issuance. An operator cannot issue `alice@bitcoin` twice, because the second issuance would require proving that `alice` was absent from a tree in which it already appears.
 
@@ -41,21 +41,20 @@ The client-side validator accepts commitments into the chain of roots without in
 
 What a handle owner actually holds is an off-chain certificate, and it contains two proofs. The first is an inclusion proof showing that the handle exists in a committed tree. The second is a non-existence proof showing that the handle was not present in any earlier commitment. Together they establish that the name belongs to its holder and never belonged to anyone else. Once issued, the certificate is valid indefinitely. There is no renewal, no expiry, and no on-chain transaction required to keep it.
 
-Proving absence explicitly against every prior commitment is correct, and it requires no cryptography beyond hashing, since a handle owner simply carries the full set of exclusion proofs. However, that proof grows with each commitment the operator makes, and becomes verbose over time. The alternative is recursive zk-SNARKs or STARKs, which compress the full chain of non-existence checks into a single succinct proof validating the rolling hash across all commitments. The protocol itself does not require ZK, but resolvers and light verifiers can implement it.
-
+Proving absence explicitly against every prior commitment is correct, and it requires no cryptography beyond hashing, since a handle owner simply carries the full set of exclusion proofs. However, as operators continue to issue new handles, the set of exclusion proofs grows over time for newer handles, and can become verbose. The alternative is recursive zk-SNARKs or STARKs, which compress the full chain of non-existence checks into a single succinct proof validating the rolling hash across all commitments. The protocol itself does not require ZK, but resolvers and light verifiers can implement it.
 
 
 ### What the Operator Can and Cannot Do
 
 The operator decides who receives a handle, which is genuine gatekeeping at the point of issuance. The auction removes any single party's control over the namespace as a whole, but it does not remove an operator's discretion within their own space.
 
-The operator cannot revoke a handle, redirect it, or recover it. The certificate is self-contained and verifies independently of whoever issued it. An operator who goes offline, sells the space, or disappears entirely has no effect on existing holders, whose certificates continue to work.
+The operator cannot revoke a handle once issued. The certificate is self-contained and verifies independently of whoever issued it. An operator who goes offline, sells the space, or disappears entirely has no effect on existing holders.
 
 There is one thing an operator can break, and it is their own namespace. Submitting an invalid commitment irreversibly ends the space's ability to issue new handles, because every subsequent commitment would need to prove non-existence against a broken predecessor and cannot do so.
 
 The same asymmetry holds if a space expires and is reacquired by someone else. A new operator needs the complete handle tree to prove non-existence for anything new, and if that tree is unavailable, the space permanently loses the ability to issue. Every handle already issued continues to function.
 
-The worst realistic failure is therefore that nobody can issue new names in that space, rather than that an existing name was taken. Concentrating the risk there is a considerably better outcome.
+The worst realistic failure is therefore that nobody can issue new names in that space, rather than that an existing name is revoked. Concentrating the risk there is a considerably better outcome.
 
 
 
@@ -66,8 +65,9 @@ The worst realistic failure is therefore that nobody can issue new names in that
 ![The lifecycle of a top level space auction](auctions-light.png)
 
 
+Spaces released to auctions are restricted to ten a day to prevent the market from being flooded, ensuring each name receives adequate attention. Initially, spaces enter the pre-auction phase, and advance to live auctions when they become one of the top 10 highest-bid spaces on a given day. Auctions last for 10 days. Last-minute bids extend the auction by one day.
 
-> **TODO:** explain how the auctions process work based on the figure above, ten per day why rate limited like this … etc. ensure reader understands this relates to top level spaces only.
+
 
 The auction mechanism is built entirely from existing Bitcoin scripting, with no soft forks or changes needed to Bitcoin.
 
@@ -77,7 +77,7 @@ The auction mechanism is built entirely from existing Bitcoin scripting, with no
 
 A single UTXO is designated to represent the space opened for auction, and this Space UTXO is passed from bidder to bidder for the duration of the auction. A bid consists of two things. The bidder burns the bid amount in an `OP_RETURN` output, and leaves behind a partially signed transaction. That transaction states, in effect, that if the bidder is outbid, the next bidder may consume the Space UTXO as long as they refund the amount.
 
-Suppose Bob opens with 1 BTC. Alice wants the name and bids 1.5 BTC. She completes Bob's PSBT, which returns his 1 BTC, and burns an additional 0.5 BTC, bringing the total burned for the auction to 1.5 BTC. She then publishes her own UTXO and PSBT as the new leading bid, and the pattern repeats until someone closes the auction.
+Suppose Bob opens with 1 BTC. Alice wants the name and bids 1.5 BTC. She completes Bob's PSBT, which reimburses his 1 BTC, and burns an additional 0.5 BTC, bringing the total burned for the auction to 1.5 BTC. She then publishes her own UTXO and PSBT as the new leading bid, and the pattern repeats until someone closes the auction.
 
 `OP_RETURN` outputs are small, and the same output is already being used to burn the bid, so the PSBT has to fit alongside it. The protocol compresses the whole PSBT into 65 bytes, consisting of a 1-byte locator plus a 64-byte signature.
 
@@ -95,41 +95,45 @@ Once bound, the script pubkey in the certificate becomes the handle's genesis, a
 
 ## A Self-Sovereign Name System Must Verify on Mobile
 
-Most decentralized name systems require a full node to verify anything. That is workable for servers but not for phones, which is where names are actually resolved, and it is a large part of why DNS continues to win.
+Most decentralized name systems make verification a job for a node: either you sync and maintain chain state on the device, or you trust an RPC endpoint and the name is only as sovereign as that endpoint. Phones are where names are actually resolved.
 
-Spaces follows a similar model to [Utreexo](https://bitcoinops.org/en/topics/utreexo/), which replaces the UTXO set with a hash accumulator so that a node can validate spends without storing the set itself. Spaces applies the same idea to naming: the entire protocol state compresses into a single 32-byte hash, the trust anchor. Once a client has that hash, verification is stateless, and a certificate either checks out against the anchor or it does not.
+Spaces compresses the entire protocol state into a single 32-byte hash, the trust anchor, in the same spirit that [Utreexo](https://bitcoinops.org/en/topics/utreexo/) replaces the UTXO set with a commitment to it. Once a client has that hash, verification is stateless: a certificate either checks out against the anchor or it does not, and nothing needs to be synced or stored.
 
-The question is where the phone obtains the trust anchor. If it fetched the anchor from a server, that server would become the trust root again. Today the answer is [Veritas](https://spacesprotocol.org/docs/use/veritas/), a small desktop application that syncs from a checkpoint, verifies Bitcoin's header chain, scans the handful of transactions that Spaces cares about, and computes the anchor locally. The user then scans the anchor into a mobile client, where it remains usable for up to two weeks, provided a state summary that stale is acceptable.
+The question is where the phone obtains the anchor. If it fetched the anchor from a server, that server would be the trust root again. Today the answer is Veritas, a small desktop application that syncs from a checkpoint, verifies Bitcoin's header chain, picks out the transactions the protocol cares about (they carry distinctive signaling patterns, so a verifier does not need to index the whole UTXO set), and computes the anchor locally. Anyone already running Bitcoin Core can derive the same value with `space-cli trust`, and the two must agree. The user scans the anchor into a mobile client, where it stays usable for up to two weeks. A stale anchor cannot verify handles issued after it was computed; everything issued before it continues to verify.
 
 The resulting value is one the user computed rather than a signature accepted from a third party, but it still means running software on a laptop. The next step, planned for early 2027, is a zero-knowledge certificate on the order of 250 KB. It proves the same computation (header chain, relevant transactions, protocol rules) as one succinct STARK, so that a client downloads it once and verifies it in milliseconds with nothing to sync.
 
-[BIP-353](https://github.com/bitcoin/bips/blob/master/bip-0353.mediawiki) reaches a similar place by a different route, but its root of trust is the [DNSSEC key hierarchy](https://www.cloudflare.com/learning/dns/dnssec/root-signing-ceremony/), which requires accepting keys on the basis of who holds them. The Spaces trust anchor is instead a hash that the verifier derives independently.
+[BIP-353](https://github.com/bitcoin/bips/blob/master/bip-0353.mediawiki) reaches a similar destination by a different route, but its root of trust is the [DNSSEC key hierarchy](https://www.cloudflare.com/learning/dns/dnssec/root-signing-ceremony/), which requires accepting keys on the basis of who holds them. The Spaces trust anchor is instead a hash that the verifier derives independently.
 
 
 
 ## Resolution and Record Storage
 
-Spaces deliberately stores no records on-chain. The responsibility of the protocol ends at proving who owns what.
+Spaces deliberately stores no records on-chain. The protocol's responsibility ends at proving who owns what.
 
-Records such as payment addresses, Nostr pubkeys, and websites travel through Certrelay, an HTTP-based relay network. Clients resolve proofs and records from Certrelay nodes and verify them against the Bitcoin-anchored trust anchor. Publishing and updating records touch zero on-chain bytes.
+Records such as payment addresses, Nostr pubkeys, and websites are signed by the handle's key and published through Certrelay, an HTTP-based relay network that serves both certificates and record sets. A client fetching alice@bitcoin gets her certificate, checks it against the trust anchor, and then checks that her records are signed by the key the certificate binds. Bitcoin vouches for the key; the key vouches for the records. Publishing and updating records touch zero on-chain bytes.
 
 Nostr is the clearest example of why this matters. A Nostr identity is a raw pubkey, and NIP-05 makes it human-readable by pointing at a DNS domain, which places a registrar and the DNS root back underneath an identity that was otherwise self-sovereign. A Spaces handle does the same job without that dependency. It is human-readable, it resolves to a key, and the client verifies it against a hash it computed itself.
 
 
+## Where This Sits Among Bitcoin "Layers"
 
-## How Is This a Bitcoin Layer 2?
+The label "Layer 2" gets stretched to cover sidechains, federations, and bridged tokens that do not inherit Bitcoin's security in any meaningful sense, so it is worth being precise about what Spaces does and does not take from the base layer.
 
-The label "Layer 2" gets stretched to cover sidechains, federations, and bridged tokens that do not inherit the security of Bitcoin in any meaningful sense.
+Spaces is a client-side validation protocol. The validity of a name is established by proofs its holder carries and any client can check. No committee signs off on state, no federation holds a multisig, and there is no bridge or separate consensus to attack. Bitcoin supplies the one thing the protocol actually needs from it: an ordering of auction bids and commitment roots that nobody can rewrite.
 
-Spaces is a client-side validation protocol. The validity of a name is established by proofs its holder carries and any client can check. No committee signs off on state, no federation holds a multisig, and there is no bridge or separate consensus to attack. Bitcoin supplies the one thing the protocol actually needs from it, which is an ordering of commitment roots that nobody can rewrite.
+There is also no security budget to maintain. Nothing is bonded or slashed, no funds sit locked to keep participants honest, and no economic assumption has to keep holding for a name to remain with its owner. Coins are burned in the auctions, but the burn only allocates top levels, deciding who receives `@example`, and no part of state validity rests on it. Burning rather than paying anyone is deliberate: there is no beneficiary, so there is nothing to capture and no reason for a token. Bids are denominated in bitcoin, transfers settle on Bitcoin, and a handle can be swapped atomically for bitcoin in a single transaction.
 
-There is also no security budget to maintain. Nothing is bonded or slashed, no funds sit locked to keep participants honest, and no economic assumption has to keep holding for a name to remain with its owner. Coins are burned in the auctions, but the burn only allocates top levels, deciding who receives `@example`, and no part of state validity rests on it. There is no new token anywhere in the design. Bids are denominated in Bitcoin, transfers settle on Bitcoin, and a handle can be swapped atomically for Bitcoin in a single transaction.
 
 Spaces does depend in part on off-chain availability: operators have to publish commitments for new issuance to continue, and relays have to serve records for lookups to resolve. Both degrade toward the inability to obtain a new name or to fetch a record, never toward a name changing hands without the consent of its owner. The security of what a holder already owns reduces to Bitcoin and a hash function.
 
 ## Wrapping Up
 
-> **TODO:** wrap up how spaces fits into the Bitcoin ecosystem, the low on-chain footprint, issuance is decentralized across many operators, adoption is needed to make it more useful … etc
+A top-level auction settles on-chain. After that, an operator writes 32 bytes whenever they choose to issue a batch of names. The handles, the records attached to them, and the proofs that back them all live off-chain and are served over Certrelay, which is why the on-chain footprint stays small no matter how many names exist.
+
+Issuance is spread across however many operators win spaces. No single party gatekeeps it, and holders do not need their operator for anything after issuance.
+
+All of this is running on mainnet today.
 
 * * *
 

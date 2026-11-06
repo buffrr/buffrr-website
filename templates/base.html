@@ -4,7 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}{{ config.title }}{% endblock %}</title>
-  {% if config.description %}<meta name="description" content="{{ config.description }}" />{% endif %}
+  <meta name="description" content="{% block description %}{{ config.description }}{% endblock %}" />
+  <meta name="author" content="{% block author %}{{ config.author }}{% endblock %}" />
   <meta property="og:type" content="{% block og_type %}website{% endblock %}" />
   <meta property="og:title" content="{% block og_title %}{{ config.title }}{% endblock %}" />
   <meta property="og:description" content="{% block og_description %}{{ config.description }}{% endblock %}" />

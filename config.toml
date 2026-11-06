@@ -1,5 +1,6 @@
 base_url = "https://buffrr.dev"
 title = "Buffrr"
+author = "buffrr"
 description = "Notes on cryptography, naming, and self-sovereign systems."
 default_language = "en"
 compile_sass = false
