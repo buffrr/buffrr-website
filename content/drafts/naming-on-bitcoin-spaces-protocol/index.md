@@ -125,7 +125,7 @@ Spaces is a client-side validation protocol. The validity of a name is establish
 There is also no security budget to maintain. Nothing is bonded or slashed, no funds sit locked to keep participants honest, and no economic assumption has to keep holding for a name to remain with its owner. Coins are burned in the auctions, but the burn only allocates top levels, deciding who receives `@example`, and no part of state validity rests on it. Burning rather than paying anyone is deliberate: there is no beneficiary, so there is nothing to capture and no reason for a token. Bids are denominated in bitcoin, transfers settle on Bitcoin, and a handle can be swapped atomically for bitcoin in a single transaction.
 
 
-Spaces does depend in part on off-chain availability: operators have to publish commitments for new issuance to continue, and relays have to serve records for lookups to resolve. Both degrade toward the inability to obtain a new name or to fetch a record, never toward a name changing hands without the consent of its owner. The security of what a holder already owns reduces to Bitcoin and a hash function.
+Spaces does depend in part on off-chain availability: operators have to publish commitments for new issuance to continue, and relays have to serve records for lookups to resolve. Both degrade toward the inability to obtain a new name from some top level space or to fetch a record, never toward a name changing hands without the consent of its owner. The security of what a holder already owns reduces to Bitcoin and a hash function.
 
 ## Wrapping Up
 
