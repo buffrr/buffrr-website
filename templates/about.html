@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page.title }} &middot; {{ config.title }}{% endblock %}
+
+{% block description %}{{ page.description | default(value=config.description) }}{% endblock %}
+{% block author %}{{ config.author }}{% endblock %}
+
+{% block og_title %}{{ page.title }}{% endblock %}
+{% block og_description %}{{ page.description | default(value=config.description) }}{% endblock %}
+{% block og_url %}{{ page.permalink | safe }}{% endblock %}
+{% block og_image %}{{ get_url(path='og/' ~ page.slug ~ '.png', trailing_slash=false) | safe }}{% endblock %}
+
+{% block content %}
+  <article>
+    <header>
+      <h1>{{ page.title }}</h1>
+    </header>
+    <div class="post-body">
+      {{ page.content | safe }}
+
+      {# Writing and Elsewhere are rendered here, after the body, so the post
+         list stays in sync with the blog section. get_section is unavailable
+         inside shortcodes, so this cannot live in the markdown itself. #}
+      {% if page.extra.list_posts %}
+        {% set blog = get_section(path="blog/_index.md") %}
+        <h2 id="writing">Writing</h2>
+        {% if blog.pages %}
+          <ul class="post-list">
+            {% for post in blog.pages %}
+              <li>
+                <a href="{{ post.permalink | safe }}">{{ post.title }}</a>
+                <time datetime="{{ post.date }}">{{ post.date | date(format="%Y-%m-%d") }}</time>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p><em>Coming soon.</em></p>
+        {% endif %}
+      {% endif %}
+
+      {% if page.extra.links %}
+        <h2 id="elsewhere">Elsewhere</h2>
+        <ul class="link-list">
+          {% for link in page.extra.links %}
+            <li><a href="{{ link.url | safe }}">{{ link.name }}</a></li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+  </article>
+{% endblock %}

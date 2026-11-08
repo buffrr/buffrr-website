@@ -60,8 +60,8 @@ article header time,
   margin-left: 0.5rem;
 }
 
-.post-list { list-style: none; padding: 0; }
-.post-list li { margin: 0.75rem 0; }
+.post-list, .link-list { list-style: none; padding: 0; }
+.post-list li, .link-list li { margin: 0.75rem 0; }
 
 img { max-width: 100%; height: auto; border-radius: 4px; }
 
